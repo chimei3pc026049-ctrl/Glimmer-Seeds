@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>微光種子 Glimmer Seeds</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Noto+Serif+TC:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg-deep:#0a0a0f;--bg-card:#12121a;--bg-elevated:#1a1a26;--bg-section:#0e0e16;
+  --amber-300:#fcd34d;--amber-400:#fbbf24;--amber-500:#f59e0b;--amber-600:#d97706;
+  --glow-gold:rgba(251,191,36,0.35);--glow-soft:rgba(251,191,36,0.08);
+  --text-primary:rgba(255,255,255,.92);--text-secondary:rgba(255,255,255,.55);--text-muted:rgba(255,255,255,.3);
+  --green-glow:#6fcf97;--green-deep:#2d6a4f;
+  --rose-glow:#f7a8c4;--rose-deep:#9b4d6a;
+  --blue-glow:#7ec8e3;--blue-deep:#3a6b8c;
+  --border:rgba(255,255,255,.06);
+  --font-display:'Cormorant Garamond',serif;
+  --font-cn:'Noto Serif TC',serif;
+  --font-body:'Noto Sans TC',sans-serif;
+}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{font-family:var(--font-body);background:var(--bg-deep);color:var(--text-primary);overflow-x:hidden}
+#glimmer-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999}
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;transition:all .4s}
+nav.scrolled{backdrop-filter:blur(20px);background:rgba(10,10,15,.8);border-bottom:1px solid var(--border)}
+.nav-logo{display:flex;align-items:center;gap:.6rem;text-decoration:none;color:var(--amber-400)}
+.nav-logo svg{width:32px;height:32px}
+.nav-logo span{font-family:var(--font-cn);font-weight:600;font-size:1.1rem;letter-spacing:.08em}
+.nav-links{display:flex;gap:2rem;list-style:none}
+.nav-links a{text-decoration:none;color:var(--text-secondary);font-size:.82rem;font-weight:400;letter-spacing:.1em;transition:color .3s;position:relative}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:var(--amber-400);transition:width .3s;box-shadow:0 0 6px var(--glow-gold)}
+.nav-links a:hover{color:var(--amber-400)}
+.nav-links a:hover::after{width:100%}
+.mobile-menu-btn{display:none;background:none;border:none;cursor:pointer;padding:.5rem}
+.mobile-menu-btn span{display:block;width:22px;height:2px;background:var(--text-secondary);margin:5px 0;transition:.3s}
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden;padding:2rem}
+.hero-bg{position:absolute;inset:0;z-index:0}
+.hero-bg .orb{position:absolute;border-radius:50%;filter:blur(80px);animation:orbFloat 8s ease-in-out infinite}
+.hero-bg .orb-1{width:500px;height:500px;background:radial-gradient(circle,rgba(251,191,36,.1),transparent);top:20%;left:40%;animation-delay:0s}
+.hero-bg .orb-2{width:300px;height:300px;background:radial-gradient(circle,rgba(247,168,196,.06),transparent);top:50%;left:20%;animation-delay:2s}
+.hero-bg .orb-3{width:350px;height:350px;background:radial-gradient(circle,rgba(126,200,227,.05),transparent);top:30%;right:10%;animation-delay:4s}
+@keyframes orbFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(20px,-15px) scale(1.05)}66%{transform:translate(-15px,10px) scale(.95)}}
+.hero-content{position:relative;z-index:1;max-width:720px}
+.hero-icon{width:140px;height:140px;margin:0 auto 2.5rem;animation:float 4s ease-in-out infinite;filter:drop-shadow(0 0 30px rgba(251,191,36,.25))}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+.hero h1{font-family:var(--font-cn);font-size:clamp(2.4rem,5vw,3.8rem);font-weight:300;letter-spacing:.2em;margin-bottom:.5rem;line-height:1.4}
+.hero h1 em{font-style:normal;font-weight:600;background:linear-gradient(135deg,var(--amber-300),var(--amber-500));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 20px rgba(251,191,36,.3))}
+.hero-en{font-family:var(--font-display);font-size:clamp(1rem,2.5vw,1.5rem);font-weight:300;letter-spacing:.35em;color:var(--amber-400);margin-bottom:2.5rem;text-transform:uppercase;text-shadow:0 0 30px rgba(251,191,36,.2)}
+.hero-tagline{font-family:var(--font-cn);font-size:1.1rem;color:var(--text-secondary);line-height:2.2;font-weight:300;letter-spacing:.08em}
+.hero-scroll{position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.5rem;color:var(--amber-400);font-size:.72rem;letter-spacing:.25em;animation:bobDown 2s ease-in-out infinite;cursor:pointer;text-decoration:none;text-shadow:0 0 10px rgba(251,191,36,.3)}
+@keyframes bobDown{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
+.mission-strip{position:relative;padding:4rem 2rem;text-align:center;overflow:hidden;background:var(--bg-section);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.mission-strip::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:200px;background:radial-gradient(ellipse,rgba(251,191,36,.06),transparent 70%);pointer-events:none}
+.mission-strip .quote-mark{font-family:var(--font-display);font-size:3rem;line-height:1;color:var(--amber-500);opacity:.3;display:block;margin-bottom:.5rem;text-shadow:0 0 20px rgba(251,191,36,.2)}
+.mission-strip p{font-family:var(--font-cn);font-size:clamp(.95rem,1.8vw,1.2rem);color:var(--text-secondary);max-width:800px;margin:0 auto;line-height:2.2;font-weight:300;letter-spacing:.06em}
+section{padding:6rem 2rem;position:relative}
+.section-inner{max-width:1100px;margin:0 auto}
+.section-label{font-family:var(--font-display);font-size:.8rem;letter-spacing:.4em;text-transform:uppercase;color:var(--amber-500);margin-bottom:.5rem;display:flex;align-items:center;gap:.8rem;text-shadow:0 0 15px rgba(251,191,36,.2)}
+.section-label::before{content:'';width:40px;height:1px;background:linear-gradient(90deg,var(--amber-500),transparent);box-shadow:0 0 8px rgba(251,191,36,.3)}
+.section-title{font-family:var(--font-cn);font-size:clamp(1.8rem,4vw,2.6rem);font-weight:500;letter-spacing:.1em;line-height:1.5;margin-bottom:.5rem}
+.section-title-en{font-family:var(--font-display);font-size:1.05rem;font-weight:300;letter-spacing:.25em;color:var(--amber-500);margin-bottom:2rem;opacity:.6}
+.section-body{font-size:.95rem;line-height:2;color:var(--text-secondary);font-weight:300}
+.pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:4rem}
+.pillar-card{position:relative;border-radius:24px;padding:2.5rem 2rem;text-align:center;transition:transform .5s ease,box-shadow .5s;cursor:default;background:var(--bg-card);border:1px solid var(--border);overflow:hidden}
+.pillar-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .5s;border-radius:24px}
+.pillar-card::after{content:'';position:absolute;bottom:-40px;left:50%;transform:translateX(-50%);width:200px;height:100px;border-radius:50%;filter:blur(40px);opacity:0;transition:opacity .5s}
+.pillar-card:hover{transform:translateY(-6px)}
+.pillar-card:hover::before{opacity:1}
+.pillar-card:hover::after{opacity:1}
+.pillar-card.walk::before{background:radial-gradient(ellipse at 50% 80%,rgba(111,207,151,.06),transparent 70%)}
+.pillar-card.walk::after{background:rgba(111,207,151,.08)}
+.pillar-card.month::before{background:radial-gradient(ellipse at 50% 80%,rgba(247,168,196,.06),transparent 70%)}
+.pillar-card.month::after{background:rgba(247,168,196,.08)}
+.pillar-card.marathon::before{background:radial-gradient(ellipse at 50% 80%,rgba(126,200,227,.06),transparent 70%)}
+.pillar-card.marathon::after{background:rgba(126,200,227,.08)}
+.pillar-icon{width:140px;height:140px;margin:0 auto 1.5rem;position:relative;z-index:1}
+.pillar-card h3{font-family:var(--font-cn);font-size:1.35rem;font-weight:600;letter-spacing:.1em;margin-bottom:.3rem;position:relative;z-index:1}
+.pillar-card .pillar-en{font-family:var(--font-display);font-size:.82rem;letter-spacing:.2em;margin-bottom:1rem;position:relative;z-index:1}
+.pillar-card.walk .pillar-en{color:var(--green-glow);text-shadow:0 0 10px rgba(111,207,151,.3)}
+.pillar-card.month .pillar-en{color:var(--rose-glow);text-shadow:0 0 10px rgba(247,168,196,.3)}
+.pillar-card.marathon .pillar-en{color:var(--blue-glow);text-shadow:0 0 10px rgba(126,200,227,.3)}
+.pillar-card p{font-size:.88rem;line-height:1.9;color:var(--text-secondary);font-weight:300;position:relative;z-index:1}
+.detail-section{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;padding:5rem 0}
+.detail-section:not(:last-child){border-bottom:1px solid var(--border)}
+.detail-section.reverse{direction:rtl}
+.detail-section.reverse>*{direction:ltr}
+.detail-visual{display:flex;align-items:center;justify-content:center}
+.detail-visual svg{width:100%;max-width:360px;height:auto}
+.detail-content .badge{display:inline-flex;align-items:center;gap:.5rem;padding:.4rem 1rem;border-radius:100px;font-size:.72rem;font-weight:500;letter-spacing:.15em;margin-bottom:1.2rem;border:1px solid}
+.badge.green{background:rgba(111,207,151,.08);color:var(--green-glow);border-color:rgba(111,207,151,.15);text-shadow:0 0 10px rgba(111,207,151,.3)}
+.badge.rose{background:rgba(247,168,196,.08);color:var(--rose-glow);border-color:rgba(247,168,196,.15);text-shadow:0 0 10px rgba(247,168,196,.3)}
+.badge.blue{background:rgba(126,200,227,.08);color:var(--blue-glow);border-color:rgba(126,200,227,.15);text-shadow:0 0 10px rgba(126,200,227,.3)}
+.detail-content h3{font-family:var(--font-cn);font-size:1.5rem;font-weight:500;letter-spacing:.08em;margin-bottom:1rem;line-height:1.5}
+.detail-content p{font-size:.92rem;line-height:2;color:var(--text-secondary);font-weight:300;margin-bottom:1rem}
+.feature-list{list-style:none;margin-top:1rem}
+.feature-list li{padding:.6rem 0;font-size:.88rem;color:var(--text-secondary);display:flex;align-items:flex-start;gap:.7rem;line-height:1.8}
+.feature-list li svg{flex-shrink:0;margin-top:.35rem;filter:drop-shadow(0 0 4px currentColor)}
+.birthday-section{background:var(--bg-section);border-top:1px solid var(--border);border-bottom:1px solid var(--border);position:relative;overflow:hidden}
+.birthday-section::before{content:'';position:absolute;top:-80px;right:-80px;width:400px;height:400px;background:radial-gradient(circle,rgba(251,191,36,.04),transparent 70%);border-radius:50%}
+.birthday-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:4rem;align-items:center}
+.birthday-stats{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:2rem}
+.stat-card{background:var(--bg-card);padding:1.2rem;border-radius:16px;text-align:center;border:1px solid var(--border)}
+.stat-card .num{font-family:var(--font-display);font-size:2rem;font-weight:600;color:var(--amber-400);text-shadow:0 0 20px rgba(251,191,36,.3)}
+.stat-card .label{font-size:.72rem;color:var(--text-muted);margin-top:.3rem;letter-spacing:.08em}
+.team-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1.2rem;margin-top:3rem}
+.team-card{text-align:center;padding:2rem 1rem;border-radius:20px;background:var(--bg-card);border:1px solid var(--border);transition:all .4s}
+.team-card:hover{border-color:rgba(251,191,36,.15);box-shadow:0 0 30px rgba(251,191,36,.05);transform:translateY(-4px)}
+.team-avatar{width:60px;height:60px;border-radius:50%;margin:0 auto .8rem;display:flex;align-items:center;justify-content:center;font-family:var(--font-cn);font-weight:600;font-size:1rem;color:var(--bg-deep)}
+.team-card:nth-child(1) .team-avatar{background:linear-gradient(135deg,var(--amber-400),var(--amber-300));box-shadow:0 0 20px rgba(251,191,36,.25)}
+.team-card:nth-child(2) .team-avatar{background:linear-gradient(135deg,var(--green-glow),#4ade80);box-shadow:0 0 20px rgba(111,207,151,.2)}
+.team-card:nth-child(3) .team-avatar{background:linear-gradient(135deg,var(--blue-glow),#60a5fa);box-shadow:0 0 20px rgba(126,200,227,.2)}
+.team-card:nth-child(4) .team-avatar{background:linear-gradient(135deg,var(--rose-glow),#f9a8d4);box-shadow:0 0 20px rgba(247,168,196,.2)}
+.team-card:nth-child(5) .team-avatar{background:linear-gradient(135deg,#c4b5fd,#a78bfa);box-shadow:0 0 20px rgba(167,139,250,.2)}
+.team-name{font-family:var(--font-cn);font-weight:600;font-size:.95rem;margin-bottom:.2rem}
+.team-role{font-size:.68rem;color:var(--amber-400);letter-spacing:.12em;font-weight:500;margin-bottom:.6rem;text-shadow:0 0 8px rgba(251,191,36,.2)}
+.team-desc{font-size:.72rem;color:var(--text-muted);line-height:1.7;font-weight:300}
+.social-section{text-align:center;border-top:1px solid var(--border)}
+.social-links{display:flex;justify-content:center;gap:1rem;margin-top:2rem;flex-wrap:wrap}
+.social-link{display:flex;align-items:center;gap:.6rem;padding:.7rem 1.3rem;border-radius:100px;background:var(--bg-card);border:1px solid var(--border);text-decoration:none;color:var(--text-secondary);font-size:.82rem;font-weight:400;transition:all .3s}
+.social-link:hover{background:var(--amber-500);color:var(--bg-deep);border-color:var(--amber-500);box-shadow:0 0 25px rgba(251,191,36,.25);transform:translateY(-2px)}
+.social-link svg{width:16px;height:16px}
+footer{background:var(--bg-deep);border-top:1px solid var(--border);text-align:center;padding:3rem 2rem}
+footer .footer-logo{font-family:var(--font-cn);font-size:1.1rem;font-weight:500;color:var(--amber-400);letter-spacing:.15em;margin-bottom:.3rem;text-shadow:0 0 15px rgba(251,191,36,.2)}
+footer .footer-en{font-family:var(--font-display);font-size:.75rem;letter-spacing:.35em;color:var(--text-muted);margin-bottom:.8rem}
+footer .footer-tagline{font-family:var(--font-cn);font-size:.82rem;color:var(--amber-500);margin-bottom:.8rem;letter-spacing:.12em;opacity:.6}
+footer p{font-size:.7rem;color:var(--text-muted);letter-spacing:.05em}
+.glow-divider{height:1px;background:linear-gradient(90deg,transparent,var(--amber-500),transparent);opacity:.15;box-shadow:0 0 15px var(--glow-gold)}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .8s ease,transform .8s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:.15s}
+.reveal-delay-2{transition-delay:.3s}
+.reveal-delay-3{transition-delay:.45s}
+@media(max-width:900px){
+  .pillars{grid-template-columns:1fr}
+  .detail-section,.birthday-grid{grid-template-columns:1fr;gap:2rem}
+  .detail-section.reverse{direction:ltr}
+  .team-grid{grid-template-columns:repeat(2,1fr)}
+  .nav-links{display:none;position:absolute;top:100%;left:0;right:0;background:rgba(10,10,15,.95);backdrop-filter:blur(20px);flex-direction:column;padding:1.5rem 2rem;gap:1.2rem;border-bottom:1px solid var(--border)}
+  .nav-links.show{display:flex}
+  .mobile-menu-btn{display:block}
+  .detail-visual svg{max-width:260px}
+}
+@media(max-width:600px){
+  .team-grid{grid-template-columns:1fr 1fr}
+  .birthday-stats{grid-template-columns:1fr 1fr}
+  section{padding:4rem 1.2rem}
+}
+</style>
+</head>
+<body>
+<canvas id="glimmer-canvas"></canvas>
+<nav id="main-nav">
+  <a href="#" class="nav-logo">
+    <svg viewBox="0 0 40 40" fill="none">
+      <circle cx="20" cy="14" r="6" fill="#fbbf24" opacity=".9"><animate attributeName="opacity" values=".9;.6;.9" dur="3s" repeatCount="indefinite"/></circle>
+      <circle cx="20" cy="14" r="10" stroke="#fbbf24" stroke-width=".8" opacity=".2"/>
+      <circle cx="20" cy="14" r="14" stroke="#fbbf24" stroke-width=".4" opacity=".08"/>
+      <path d="M20 22 C16 27 14 33 16 37 Q18 39 20 35 Q22 39 24 37 C26 33 24 27 20 22Z" fill="#6fcf97" opacity=".6"/>
+    </svg>
+    <span>微光種子</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#about">關於我們</a></li>
+    <li><a href="#pillars">三大主題</a></li>
+    <li><a href="#walk">微光隨行</a></li>
+    <li><a href="#month">微光月</a></li>
+    <li><a href="#marathon">微光馬</a></li>
+    <li><a href="#birthday">慶生計畫</a></li>
+    <li><a href="#team">團隊</a></li>
+  </ul>
+  <button class="mobile-menu-btn" onclick="document.querySelector('.nav-links').classList.toggle('show')" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+
+<section class="hero" id="home">
+  <div class="hero-bg"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div></div>
+  <div class="hero-content">
+    <div class="hero-icon">
+      <svg viewBox="0 0 140 140" fill="none">
+        <circle cx="70" cy="45" r="45" stroke="#fbbf24" stroke-width=".5" opacity=".1"><animate attributeName="r" values="45;55;45" dur="5s" repeatCount="indefinite"/><animate attributeName="opacity" values=".1;.05;.1" dur="5s" repeatCount="indefinite"/></circle>
+        <circle cx="70" cy="45" r="30" stroke="#fbbf24" stroke-width=".5" opacity=".15"><animate attributeName="r" values="30;38;30" dur="4s" repeatCount="indefinite"/></circle>
+        <ellipse cx="70" cy="32" rx="14" ry="20" fill="#fbbf24" opacity=".25"><animate attributeName="ry" values="20;24;20" dur="3s" repeatCount="indefinite"/></ellipse>
+        <ellipse cx="70" cy="32" rx="8" ry="13" fill="#fcd34d" opacity=".45"><animate attributeName="ry" values="13;16;13" dur="2.5s" repeatCount="indefinite"/></ellipse>
+        <ellipse cx="70" cy="30" rx="3" ry="6" fill="#fef3c7" opacity=".8"><animate attributeName="ry" values="6;8;6" dur="2s" repeatCount="indefinite"/></ellipse>
+        <rect x="42" y="58" width="56" height="28" rx="5" fill="#f7a8c4" opacity=".25"/>
+        <rect x="36" y="54" width="68" height="9" rx="4.5" fill="#f7a8c4" opacity=".35"/>
+        <rect x="39" y="80" width="62" height="9" rx="4.5" fill="#9b4d6a" opacity=".2"/>
+        <rect x="66" y="42" width="8" height="16" rx="4" fill="#fde68a" opacity=".5"/>
+        <path d="M70 96 C64 102 60 112 63 120 Q66.5 124 70 118 Q73.5 124 77 120 C80 112 76 102 70 96Z" fill="#6fcf97" opacity=".4"/>
+        <path d="M66 104 C64 108 65 113 67 116" stroke="#6fcf97" stroke-width=".8" fill="none" opacity=".5"/>
+        <path d="M74 104 C76 108 75 113 73 116" stroke="#6fcf97" stroke-width=".8" fill="none" opacity=".5"/>
+      </svg>
+    </div>
+    <h1><em>微光種子</em></h1>
+    <div class="hero-en">Glimmer Seeds</div>
+    <p class="hero-tagline">點亮微光，種下希望<br>即便力量薄弱，只要能精準地照亮一個生命<br>那便具備了存在的意義</p>
+  </div>
+  <a href="#about" class="hero-scroll"><span>探索更多</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg></a>
+</section>
+
+<div class="mission-strip" id="about">
+  <span class="quote-mark">&ldquo;</span>
+  <p>透過數位轉型與跨域資源整合，建構一套「三方共好」的公益循環模式，<br>將大眾的日常動能精準轉化為長期的關懷力量，<br>確保每份微光都能精準傳遞，陪伴孩童跨越成長的陰影。</p>
+</div>
+
+<section id="pillars">
+  <div class="section-inner">
+    <div class="section-label reveal">Core Programs</div>
+    <h2 class="section-title reveal">三大核心計畫</h2>
+    <div class="section-title-en reveal">Three Pillars of Light</div>
+    <p class="section-body reveal">以數位健康、企業實踐、全通路媒體與在地產業，編織一套溫暖而永續的循環生態系。</p>
+    <div class="pillars">
+      <div class="pillar-card walk reveal reveal-delay-1">
+        <div class="pillar-icon">
+          <svg viewBox="0 0 140 140" fill="none">
+            <path d="M10 110 Q40 95 70 100 Q100 105 130 95" stroke="#6fcf97" stroke-width="1.5" stroke-dasharray="4 4" opacity=".3"/>
+            <ellipse cx="30" cy="100" rx="4" ry="7" fill="#6fcf97" opacity=".15" transform="rotate(-15 30 100)"/>
+            <ellipse cx="50" cy="95" rx="4" ry="7" fill="#6fcf97" opacity=".2" transform="rotate(10 50 95)"/>
+            <ellipse cx="72" cy="93" rx="4" ry="7" fill="#6fcf97" opacity=".25" transform="rotate(-10 72 93)"/>
+            <ellipse cx="95" cy="90" rx="4" ry="7" fill="#6fcf97" opacity=".3" transform="rotate(15 95 90)"/>
+            <rect x="48" y="30" width="28" height="48" rx="6" fill="#6fcf97" opacity=".08" stroke="#6fcf97" stroke-width=".5" stroke-opacity=".2"/>
+            <rect x="52" y="36" width="20" height="30" rx="3" fill="#6fcf97" opacity=".05"/>
+            <circle cx="56" cy="44" r="2.5" fill="#fbbf24" opacity=".7"><animate attributeName="opacity" values=".7;.3;.7" dur="2s" repeatCount="indefinite"/></circle>
+            <circle cx="66" cy="50" r="2" fill="#fbbf24" opacity=".5"><animate attributeName="opacity" values=".5;.2;.5" dur="2.5s" repeatCount="indefinite"/></circle>
+            <circle cx="60" cy="58" r="2.5" fill="#fbbf24" opacity=".6"><animate attributeName="opacity" values=".6;.3;.6" dur="1.8s" repeatCount="indefinite"/></circle>
+            <circle cx="62" cy="22" r="10" fill="#fbbf24" opacity=".06"><animate attributeName="r" values="10;16;10" dur="3s" repeatCount="indefinite"/></circle>
+            <circle cx="62" cy="22" r="4" fill="#fbbf24" opacity=".15"><animate attributeName="opacity" values=".15;.3;.15" dur="2s" repeatCount="indefinite"/></circle>
+          </svg>
+        </div>
+        <h3>微光隨行</h3><div class="pillar-en">Glimmer Walk</div>
+        <p>數位行為轉化平台——將你的每一步化為微光，點亮公益地圖上的希望座標。</p>
+      </div>
+      <div class="pillar-card month reveal reveal-delay-2">
+        <div class="pillar-icon">
+          <svg viewBox="0 0 140 140" fill="none">
+            <rect x="35" y="72" width="70" height="30" rx="6" fill="#f7a8c4" opacity=".12"/>
+            <rect x="30" y="68" width="80" height="10" rx="5" fill="#f7a8c4" opacity=".2"/>
+            <rect x="33" y="96" width="74" height="10" rx="5" fill="#9b4d6a" opacity=".1"/>
+            <path d="M15 85 Q20 78 28 80" stroke="#f7a8c4" stroke-width="2" stroke-linecap="round" fill="none" opacity=".3"/>
+            <path d="M125 85 Q120 78 112 80" stroke="#f7a8c4" stroke-width="2" stroke-linecap="round" fill="none" opacity=".3"/>
+            <path d="M55 52 C55 47 48 45 48 50 C48 55 55 60 55 60 C55 60 62 55 62 50 C62 45 55 47 55 52Z" fill="#f7a8c4" opacity=".4"><animate attributeName="opacity" values=".4;.7;.4" dur="2.5s" repeatCount="indefinite"/></path>
+            <path d="M85 47 C85 43 80 42 80 46 C80 49 85 53 85 53 C85 53 90 49 90 46 C90 42 85 43 85 47Z" fill="#9b4d6a" opacity=".3"><animate attributeName="opacity" values=".3;.6;.3" dur="3s" repeatCount="indefinite"/></path>
+            <circle cx="25" cy="45" r="6" fill="#f7a8c4" opacity=".15"/>
+            <path d="M15 70 Q15 55 25 55 Q35 55 35 70" fill="#f7a8c4" opacity=".08"/>
+            <circle cx="115" cy="45" r="6" fill="#f7a8c4" opacity=".15"/>
+            <path d="M105 70 Q105 55 115 55 Q125 55 125 70" fill="#f7a8c4" opacity=".08"/>
+            <path d="M70 32 L71 27 L72 32 L77 33 L72 34 L71 39 L70 34 L65 33Z" fill="#fbbf24" opacity=".35"><animate attributeName="opacity" values=".35;.7;.35" dur="2s" repeatCount="indefinite"/></path>
+          </svg>
+        </div>
+        <h3>微光月</h3><div class="pillar-en">Glimmer Month</div>
+        <p>年度旗艦公益行動——企業化身志工夥伴，深入角落親手傳遞蛋糕與溫暖。</p>
+      </div>
+      <div class="pillar-card marathon reveal reveal-delay-3">
+        <div class="pillar-icon">
+          <svg viewBox="0 0 140 140" fill="none">
+            <rect x="15" y="80" width="12" height="30" rx="1" fill="#7ec8e3" opacity=".1"/>
+            <rect x="32" y="70" width="15" height="40" rx="1" fill="#3a6b8c" opacity=".1"/>
+            <rect x="52" y="60" width="10" height="50" rx="1" fill="#7ec8e3" opacity=".08"/>
+            <rect x="67" y="75" width="18" height="35" rx="1" fill="#3a6b8c" opacity=".1"/>
+            <rect x="90" y="65" width="12" height="45" rx="1" fill="#7ec8e3" opacity=".1"/>
+            <rect x="107" y="78" width="16" height="32" rx="1" fill="#3a6b8c" opacity=".08"/>
+            <rect x="36" y="78" width="3" height="3" rx=".5" fill="#fbbf24" opacity=".3"/>
+            <rect x="93" y="72" width="3" height="3" rx=".5" fill="#fbbf24" opacity=".35"/>
+            <rect x="72" y="82" width="3" height="3" rx=".5" fill="#fbbf24" opacity=".25"/>
+            <rect x="112" y="85" width="3" height="3" rx=".5" fill="#fbbf24" opacity=".3"/>
+            <circle cx="70" cy="90" r="4" fill="#7ec8e3" opacity=".35"/>
+            <path d="M70 94 L70 104 M65 98 L75 98 M70 104 L65 113 M70 104 L75 113" stroke="#7ec8e3" stroke-width="1.5" stroke-linecap="round" opacity=".3"/>
+            <circle cx="70" cy="22" r="16" fill="#fbbf24" opacity=".04"><animate attributeName="r" values="16;24;16" dur="4s" repeatCount="indefinite"/></circle>
+            <circle cx="70" cy="22" r="8" fill="#fbbf24" opacity=".1"><animate attributeName="r" values="8;14;8" dur="3s" repeatCount="indefinite"/></circle>
+            <circle cx="70" cy="22" r="4" fill="#fbbf24" opacity=".4"><animate attributeName="opacity" values=".4;.7;.4" dur="2s" repeatCount="indefinite"/></circle>
+            <line x1="70" y1="35" x2="70" y2="55" stroke="#fbbf24" stroke-width=".8" opacity=".1"/>
+            <circle cx="45" cy="108" r="2" fill="#fbbf24" opacity=".2"/>
+            <circle cx="55" cy="105" r="2" fill="#fbbf24" opacity=".25"/>
+          </svg>
+        </div>
+        <h3>微光馬</h3><div class="pillar-en">Glimmer Marathon</div>
+        <p>年度品牌公益盛事——匯聚眾人微光，點亮台南城市地標的公益馬拉松。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<section id="walk">
+  <div class="section-inner">
+    <div class="detail-section">
+      <div class="detail-visual reveal">
+        <svg viewBox="0 0 360 300" fill="none">
+          <circle cx="180" cy="150" r="120" fill="#6fcf97" opacity=".03"/>
+          <circle cx="180" cy="150" r="80" stroke="#6fcf97" stroke-width=".5" opacity=".08"/>
+          <line x1="100" y1="150" x2="260" y2="150" stroke="#6fcf97" stroke-width=".3" opacity=".1"/>
+          <line x1="180" y1="70" x2="180" y2="230" stroke="#6fcf97" stroke-width=".3" opacity=".1"/>
+          <path d="M120 200 Q140 170 160 175 Q180 180 200 150 Q220 120 240 130" stroke="#6fcf97" stroke-width="1.5" stroke-dasharray="6 4" fill="none" opacity=".25"/>
+          <circle cx="120" cy="200" r="6" fill="#fbbf24" opacity=".3"><animate attributeName="opacity" values=".3;.6;.3" dur="2s" repeatCount="indefinite"/></circle>
+          <circle cx="120" cy="200" r="12" fill="#fbbf24" opacity=".05"><animate attributeName="r" values="12;18;12" dur="2s" repeatCount="indefinite"/></circle>
+          <circle cx="160" cy="175" r="8" fill="#fbbf24" opacity=".35"><animate attributeName="opacity" values=".35;.65;.35" dur="2.5s" repeatCount="indefinite"/></circle>
+          <circle cx="160" cy="175" r="16" fill="#fbbf24" opacity=".04"><animate attributeName="r" values="16;22;16" dur="2.5s" repeatCount="indefinite"/></circle>
+          <circle cx="200" cy="150" r="7" fill="#fbbf24" opacity=".3"><animate attributeName="opacity" values=".3;.55;.3" dur="3s" repeatCount="indefinite"/></circle>
+          <circle cx="240" cy="130" r="10" fill="#fbbf24" opacity=".4"><animate attributeName="opacity" values=".4;.7;.4" dur="2.2s" repeatCount="indefinite"/></circle>
+          <circle cx="240" cy="130" r="20" fill="#fbbf24" opacity=".04"><animate attributeName="r" values="20;28;20" dur="2.2s" repeatCount="indefinite"/></circle>
+          <rect x="155" y="55" width="50" height="80" rx="10" fill="none" stroke="#6fcf97" stroke-width="1" opacity=".2"/>
+          <text x="180" y="100" text-anchor="middle" font-size="10" fill="#6fcf97" opacity=".35" font-family="sans-serif" font-weight="bold">8,432</text>
+          <text x="180" y="112" text-anchor="middle" font-size="7" fill="#6fcf97" opacity=".25" font-family="sans-serif">步</text>
+        </svg>
+      </div>
+      <div class="detail-content reveal">
+        <div class="badge green"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6fcf97" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>數位行為轉化平台</div>
+        <h3>微光隨行 Glimmer Walk</h3>
+        <p>營運品牌專屬 APP，透過 API 串聯大眾日常步數。使用者在行走時點亮數位地圖上的微光，將物理動能轉化為數位積分。</p>
+        <ul class="feature-list">
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6fcf97" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>公益遊戲化機制——行走即公益，步數即善意</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6fcf97" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>企業員工賦能——員工步數觸發企業贊助資金撥付</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6fcf97" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>深度連結企業永續文化與員工健康管理</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<section id="month" style="background:var(--bg-section)">
+  <div class="section-inner">
+    <div class="detail-section reverse">
+      <div class="detail-visual reveal">
+        <svg viewBox="0 0 360 300" fill="none">
+          <circle cx="180" cy="150" r="120" fill="#f7a8c4" opacity=".03"/>
+          <rect x="110" y="65" width="140" height="120" rx="12" fill="none" stroke="#f7a8c4" stroke-width=".8" opacity=".15"/>
+          <rect x="110" y="65" width="140" height="30" rx="12" fill="#f7a8c4" opacity=".06"/>
+          <text x="180" y="85" text-anchor="middle" font-size="12" fill="#f7a8c4" font-weight="bold" font-family="sans-serif" opacity=".35">微光月</text>
+          <circle cx="140" cy="115" r="4" fill="#f7a8c4" opacity=".1"/>
+          <circle cx="165" cy="115" r="4" fill="#fbbf24" opacity=".35"><animate attributeName="opacity" values=".35;.6;.35" dur="2s" repeatCount="indefinite"/></circle>
+          <circle cx="165" cy="115" r="8" fill="#fbbf24" opacity=".05"/>
+          <circle cx="190" cy="115" r="4" fill="#f7a8c4" opacity=".1"/>
+          <circle cx="215" cy="115" r="4" fill="#fbbf24" opacity=".3"><animate attributeName="opacity" values=".3;.55;.3" dur="2.5s" repeatCount="indefinite"/></circle>
+          <circle cx="140" cy="145" r="4" fill="#fbbf24" opacity=".25"/>
+          <circle cx="165" cy="145" r="4" fill="#f7a8c4" opacity=".1"/>
+          <circle cx="190" cy="145" r="4" fill="#fbbf24" opacity=".35"><animate attributeName="opacity" values=".35;.6;.35" dur="1.8s" repeatCount="indefinite"/></circle>
+          <circle cx="215" cy="145" r="4" fill="#f7a8c4" opacity=".1"/>
+          <rect x="150" y="220" width="60" height="22" rx="5" fill="#f7a8c4" opacity=".12"/>
+          <rect x="145" y="216" width="70" height="8" rx="4" fill="#f7a8c4" opacity=".18"/>
+          <path d="M180 195 L180 215" stroke="#f7a8c4" stroke-width="1" stroke-dasharray="3 3" opacity=".15"/>
+          <path d="M180 205 C180 201 175 200 175 203 C175 206 180 209 180 209 C180 209 185 206 185 203 C185 200 180 201 180 205Z" fill="#f7a8c4" opacity=".4"><animate attributeName="opacity" values=".4;.7;.4" dur="2s" repeatCount="indefinite"/></path>
+        </svg>
+      </div>
+      <div class="detail-content reveal">
+        <div class="badge rose"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f7a8c4" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>年度旗艦公益行動</div>
+        <h3>微光月 Glimmer Month</h3>
+        <p>協助企業由單純出資者轉化為「志工夥伴」。規劃實體參與路徑，帶領企業團隊深入角落親自發送蛋糕、採集「微光故事」，讓 ESG 投入從金錢支出轉變為具備溫度的社會實踐。</p>
+        <ul class="feature-list">
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f7a8c4" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>企業實踐轉化——從出資者到志工夥伴</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f7a8c4" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>微光故事採集——記錄每一份溫暖的傳遞瞬間</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f7a8c4" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>ESG 溫度轉型——讓社會責任從報表走入現場</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<section id="marathon">
+  <div class="section-inner">
+    <div class="detail-section">
+      <div class="detail-visual reveal">
+        <svg viewBox="0 0 360 300" fill="none">
+          <circle cx="180" cy="130" r="120" fill="#7ec8e3" opacity=".02"/>
+          <rect x="40" y="160" width="25" height="60" rx="2" fill="#7ec8e3" opacity=".06"/>
+          <rect x="72" y="140" width="30" height="80" rx="2" fill="#3a6b8c" opacity=".06"/>
+          <rect x="110" y="130" width="20" height="90" rx="2" fill="#7ec8e3" opacity=".06"/>
+          <rect x="140" y="150" width="35" height="70" rx="2" fill="#3a6b8c" opacity=".06"/>
+          <rect x="185" y="125" width="25" height="95" rx="2" fill="#7ec8e3" opacity=".06"/>
+          <rect x="220" y="145" width="30" height="75" rx="2" fill="#3a6b8c" opacity=".06"/>
+          <rect x="258" y="135" width="22" height="85" rx="2" fill="#7ec8e3" opacity=".06"/>
+          <rect x="290" y="155" width="28" height="65" rx="2" fill="#3a6b8c" opacity=".06"/>
+          <rect x="78" y="150" width="3" height="3" rx=".5" fill="#fbbf24" opacity=".35"/>
+          <rect x="86" y="165" width="3" height="3" rx=".5" fill="#fbbf24" opacity=".25"/>
+          <rect x="148" y="165" width="3" height="3" rx=".5" fill="#fbbf24" opacity=".3"/>
+          <rect x="192" y="140" width="3" height="3" rx=".5" fill="#fbbf24" opacity=".2"/>
+          <rect x="225" y="160" width="3" height="3" rx=".5" fill="#fbbf24" opacity=".3"/>
+          <rect x="265" y="150" width="3" height="3" rx=".5" fill="#fbbf24" opacity=".25"/>
+          <circle cx="90" cy="230" r="3" fill="#7ec8e3" opacity=".1"/>
+          <circle cx="120" cy="228" r="3" fill="#7ec8e3" opacity=".15"/>
+          <circle cx="150" cy="225" r="4" fill="#7ec8e3" opacity=".2"/>
+          <circle cx="180" cy="215" r="5" fill="#7ec8e3" opacity=".3"/>
+          <path d="M180 220 L180 232 M174 225 L186 225 M180 232 L174 242 M180 232 L186 242" stroke="#7ec8e3" stroke-width="1.5" stroke-linecap="round" opacity=".25"/>
+          <circle cx="180" cy="55" r="30" fill="#fbbf24" opacity=".03"><animate attributeName="r" values="30;45;30" dur="5s" repeatCount="indefinite"/></circle>
+          <circle cx="180" cy="55" r="18" fill="#fbbf24" opacity=".06"><animate attributeName="r" values="18;26;18" dur="4s" repeatCount="indefinite"/></circle>
+          <circle cx="180" cy="55" r="8" fill="#fbbf24" opacity=".2"><animate attributeName="opacity" values=".2;.4;.2" dur="2s" repeatCount="indefinite"/></circle>
+          <circle cx="180" cy="55" r="3" fill="#fbbf24" opacity=".5"/>
+          <line x1="180" y1="70" x2="180" y2="120" stroke="#fbbf24" stroke-width=".8" opacity=".08"/>
+        </svg>
+      </div>
+      <div class="detail-content reveal">
+        <div class="badge blue"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7ec8e3" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>年度品牌公益盛事</div>
+        <h3>微光馬 Glimmer Marathon</h3>
+        <p>策劃以「點亮台南城市地標」為終點的年度公益馬拉松。作為「微光隨行」年度積分的結算巔峰，象徵將眾人的微光匯聚成改變的力量。</p>
+        <ul class="feature-list">
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7ec8e3" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>虛實整合盛事——年度積分結算巔峰</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7ec8e3" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>企業公益排行榜——良性競爭的「微光領航者」榮譽</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7ec8e3" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>全通路擴散——四大商圈電子牆 × 500 間超商看板同步</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<section class="birthday-section" id="birthday">
+  <div class="section-inner">
+    <div class="section-label reveal">Signature Program</div>
+    <h2 class="section-title reveal">微光慶生計畫</h2>
+    <div class="section-title-en reveal">Birthday Celebration Initiative</div>
+    <div class="birthday-grid">
+      <div class="detail-content reveal">
+        <p>在多數人的成長記憶中，生日象徵著被重視與被祝福的一天。然而，對於部分弱勢家庭的孩童而言，「生日」卻往往只是平凡的一天。</p>
+        <p>本計畫以「集食送愛」為核心理念，透過社會大眾的參與與資源串聯，募集生日蛋糕送至有需要的對象手中，讓每一位孩子都能在屬於自己的日子裡，感受到來自社會的溫暖與祝福。</p>
+        <p style="color:var(--amber-400);font-weight:400;font-family:var(--font-cn);letter-spacing:.08em;margin-top:1.5rem;text-shadow:0 0 15px rgba(251,191,36,.15)">「被記得的生日，是每個孩子應有的權利。」</p>
+      </div>
+      <div class="birthday-visual reveal">
+        <svg viewBox="0 0 360 240" fill="none">
+          <circle cx="180" cy="100" r="100" fill="#fbbf24" opacity=".03"/>
+          <rect x="110" y="100" width="140" height="50" rx="10" fill="#f7a8c4" opacity=".12"/>
+          <rect x="100" y="93" width="160" height="14" rx="7" fill="#f7a8c4" opacity=".18"/>
+          <rect x="105" y="144" width="150" height="14" rx="7" fill="#9b4d6a" opacity=".08"/>
+          <rect x="135" y="72" width="4" height="24" rx="2" fill="#fde68a" opacity=".3"/>
+          <ellipse cx="137" cy="68" rx="5" ry="8" fill="#fbbf24" opacity=".3"><animate attributeName="ry" values="8;11;8" dur="1.5s" repeatCount="indefinite"/></ellipse>
+          <ellipse cx="137" cy="68" rx="10" ry="14" fill="#fbbf24" opacity=".05"/>
+          <rect x="165" y="67" width="4" height="29" rx="2" fill="#7ec8e3" opacity=".25"/>
+          <ellipse cx="167" cy="63" rx="5" ry="8" fill="#fbbf24" opacity=".3"><animate attributeName="ry" values="8;11;8" dur="1.8s" repeatCount="indefinite"/></ellipse>
+          <ellipse cx="167" cy="63" rx="10" ry="14" fill="#fbbf24" opacity=".05"/>
+          <rect x="195" y="70" width="4" height="26" rx="2" fill="#6fcf97" opacity=".25"/>
+          <ellipse cx="197" cy="66" rx="5" ry="8" fill="#fbbf24" opacity=".3"><animate attributeName="ry" values="8;11;8" dur="2s" repeatCount="indefinite"/></ellipse>
+          <ellipse cx="197" cy="66" rx="10" ry="14" fill="#fbbf24" opacity=".05"/>
+          <rect x="225" y="72" width="4" height="24" rx="2" fill="#f7a8c4" opacity=".25"/>
+          <ellipse cx="227" cy="68" rx="5" ry="8" fill="#fbbf24" opacity=".3"><animate attributeName="ry" values="8;11;8" dur="1.6s" repeatCount="indefinite"/></ellipse>
+          <ellipse cx="227" cy="68" rx="10" ry="14" fill="#fbbf24" opacity=".05"/>
+          <path d="M90 55 L92 49 L94 55 L100 57 L94 59 L92 65 L90 59 L84 57Z" fill="#fbbf24" opacity=".2"><animate attributeName="opacity" values=".2;.5;.2" dur="2s" repeatCount="indefinite"/></path>
+          <path d="M270 50 L271 46 L272 50 L276 51 L272 52 L271 56 L270 52 L266 51Z" fill="#fbbf24" opacity=".15"><animate attributeName="opacity" values=".15;.4;.15" dur="2.5s" repeatCount="indefinite"/></path>
+          <circle cx="180" cy="190" r="10" fill="rgba(255,255,255,.06)"/>
+          <path d="M170 220 Q170 205 180 205 Q190 205 190 220" fill="rgba(255,255,255,.04)"/>
+          <path d="M175 193 Q180 198 185 193" stroke="rgba(255,255,255,.15)" stroke-width=".8" fill="none"/>
+        </svg>
+        <div class="birthday-stats">
+          <div class="stat-card"><div class="num">365</div><div class="label">天天都有生日</div></div>
+          <div class="stat-card"><div class="num">∞</div><div class="label">無限份微光祝福</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<section id="team">
+  <div class="section-inner">
+    <div class="section-label reveal">Our Team</div>
+    <h2 class="section-title reveal">核心團隊</h2>
+    <div class="section-title-en reveal">The Seeds Behind the Light</div>
+    <div class="team-grid">
+      <div class="team-card reveal reveal-delay-1"><div class="team-avatar">子喬</div><div class="team-name">林子喬</div><div class="team-role">CEO & CSO</div><div class="team-desc">策略與永續長<br>品牌願景、商模開發與 SROI 價值評估</div></div>
+      <div class="team-card reveal reveal-delay-1"><div class="team-avatar">丞芫</div><div class="team-name">柯丞芫</div><div class="team-role">CBO</div><div class="team-desc">商務與通路開發<br>企業贊助開發與全通路媒體整合</div></div>
+      <div class="team-card reveal reveal-delay-2"><div class="team-avatar">宗瀚</div><div class="team-name">紀宗瀚</div><div class="team-role">CTO</div><div class="team-desc">技術長<br>APP 開發與 API 數據維運</div></div>
+      <div class="team-card reveal reveal-delay-2"><div class="team-avatar">佳靈</div><div class="team-name">郭佳靈</div><div class="team-role">COO</div><div class="team-desc">營運長<br>永續供應鏈管理與志工路徑實踐</div></div>
+      <div class="team-card reveal reveal-delay-3"><div class="team-avatar">嘉真</div><div class="team-name">張嘉真</div><div class="team-role">CMO</div><div class="team-desc">創意行銷長<br>品牌影像全紀錄與地標盛事策劃</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<section class="social-section" id="social">
+  <div class="section-inner" style="max-width:600px">
+    <h2 class="section-title reveal" style="text-align:center">加入微光</h2>
+    <div class="section-title-en reveal" style="text-align:center">Connect With Us</div>
+    <div class="social-links reveal">
+      <a href="#" class="social-link"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.879V14.89h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.989C18.343 21.129 22 16.99 22 12c0-5.523-4.477-10-10-10z"/></svg>Facebook</a>
+      <a href="#" class="social-link"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-2.716 0-3.056.012-4.123.06-1.064.049-1.791.218-2.427.465A4.9 4.9 0 0 0 3.678 3.68a4.9 4.9 0 0 0-1.153 1.772c-.247.636-.416 1.363-.465 2.427C2.012 8.944 2 9.284 2 12s.012 3.056.06 4.123c.049 1.064.218 1.791.465 2.427a4.9 4.9 0 0 0 1.153 1.772 4.9 4.9 0 0 0 1.772 1.153c.636.247 1.363.416 2.427.465C8.944 21.988 9.284 22 12 22s3.056-.012 4.123-.06c1.064-.049 1.791-.218 2.427-.465a4.9 4.9 0 0 0 1.772-1.153 4.9 4.9 0 0 0 1.153-1.772c.247-.636.416-1.363.465-2.427.048-1.067.06-1.407.06-4.123s-.012-3.056-.06-4.123c-.049-1.064-.218-1.791-.465-2.427a4.9 4.9 0 0 0-1.153-1.772A4.9 4.9 0 0 0 18.55 2.525c-.636-.247-1.363-.416-2.427-.465C15.056 2.012 14.716 2 12 2zm0 1.802c2.67 0 2.986.01 4.04.058.976.045 1.505.207 1.858.344.467.182.8.398 1.15.748.35.35.567.683.748 1.15.137.353.3.882.344 1.857.048 1.055.058 1.37.058 4.041s-.01 2.986-.058 4.04c-.045.976-.207 1.505-.344 1.858a3.1 3.1 0 0 1-.748 1.15 3.1 3.1 0 0 1-1.15.748c-.353.137-.882.3-1.857.344-1.054.048-1.37.058-4.041.058s-2.987-.01-4.04-.058c-.976-.045-1.505-.207-1.858-.344a3.1 3.1 0 0 1-1.15-.748 3.1 3.1 0 0 1-.748-1.15c-.137-.353-.3-.882-.344-1.857-.048-1.055-.058-1.37-.058-4.041s.01-2.986.058-4.04c.045-.976.207-1.505.344-1.858.182-.467.398-.8.748-1.15.35-.35.683-.567 1.15-.748.353-.137.882-.3 1.857-.344C9.014 3.812 9.33 3.802 12 3.802zm0 3.063A5.135 5.135 0 1 0 12 17.135 5.135 5.135 0 0 0 12 6.865zm0 8.468A3.333 3.333 0 1 1 12 8.667a3.333 3.333 0 0 1 0 6.666zm6.538-8.671a1.2 1.2 0 1 1-2.4 0 1.2 1.2 0 0 1 2.4 0z"/></svg>Instagram</a>
+      <a href="#" class="social-link"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>官方網站</a>
+      <a href="#" class="social-link"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 2H7c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-3 18h-4v-1h4v1zm2.25-3H7.75V5h8.5v12z"/></svg>下載 APP</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">微光種子</div>
+  <div class="footer-en">GLIMMER SEEDS</div>
+  <div class="footer-tagline">點亮微光，種下希望</div>
+  <p>&copy; 2025 Glimmer Seeds. All rights reserved.</p>
+</footer>
+
+<script>
+const canvas=document.getElementById('glimmer-canvas');
+const ctx=canvas.getContext('2d');
+let particles=[];
+const COUNT=55;
+
+function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}
+resize();window.addEventListener('resize',resize);
+
+// ===== AMBIENT FLOATING PARTICLES =====
+class P{
+  constructor(){this.reset()}
+  reset(){
+    this.x=Math.random()*canvas.width;
+    this.y=canvas.height+10+Math.random()*200;
+    this.size=Math.random()*2.5+.8;
+    this.vy=-(Math.random()*.45+.12);
+    this.vx=(Math.random()-.5)*.25;
+    this.maxOp=Math.random()*.45+.1;
+    this.op=0;
+    this.wobSpd=Math.random()*.015+.004;
+    this.wobOff=Math.random()*Math.PI*2;
+    this.life=0;
+    this.hue=38+Math.random()*8;
+    this.sat=85+Math.random()*10;
+  }
+  update(){
+    this.life++;
+    this.y+=this.vy;
+    this.x+=this.vx+Math.sin(this.life*this.wobSpd+this.wobOff)*.35;
+    if(this.life<80)this.op=this.maxOp*(this.life/80);
+    else this.op=this.maxOp;
+    if(this.y<-30)this.reset();
+  }
+  draw(){
+    ctx.save();ctx.globalAlpha=this.op;
+    ctx.beginPath();ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
+    ctx.fillStyle=`hsl(${this.hue},${this.sat}%,75%)`;ctx.fill();
+    let g1=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.size*4);
+    g1.addColorStop(0,`hsla(${this.hue},${this.sat}%,75%,.35)`);
+    g1.addColorStop(1,`hsla(${this.hue},${this.sat}%,75%,0)`);
+    ctx.beginPath();ctx.arc(this.x,this.y,this.size*4,0,Math.PI*2);ctx.fillStyle=g1;ctx.fill();
+    let g2=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.size*8);
+    g2.addColorStop(0,`hsla(${this.hue},${this.sat}%,70%,.08)`);
+    g2.addColorStop(1,`hsla(${this.hue},${this.sat}%,70%,0)`);
+    ctx.beginPath();ctx.arc(this.x,this.y,this.size*8,0,Math.PI*2);ctx.fillStyle=g2;ctx.fill();
+    ctx.restore();
+  }
+}
+for(let i=0;i<COUNT;i++){let p=new P();p.y=Math.random()*canvas.height;p.life=Math.random()*250;particles.push(p)}
+
+// ===== MOUSE GENTLE GLIMMER TRAIL =====
+let mouseTrail=[];
+let mouse={x:-999,y:-999,px:-999,py:-999,active:false};
+const TRAIL_MAX=80;
+
+class Glimmer{
+  constructor(x,y){
+    this.x=x+(Math.random()-0.5)*16;
+    this.y=y+(Math.random()-0.5)*16;
+    // very gentle drift — mostly upward float with slight wander
+    this.vx=(Math.random()-0.5)*0.3;
+    this.vy=-(Math.random()*0.25+0.08);
+    this.size=Math.random()*2+0.8;
+    this.initSize=this.size;
+    this.life=0;
+    this.maxLife=80+Math.random()*80;
+    this.hue=36+Math.random()*12;
+    this.sat=60+Math.random()*25;
+    this.lit=75+Math.random()*10;
+    this.wobSpd=Math.random()*0.03+0.008;
+    this.wobOff=Math.random()*Math.PI*2;
+    this.wobAmp=Math.random()*0.4+0.15;
+  }
+  update(){
+    this.life++;
+    this.x+=this.vx+Math.sin(this.life*this.wobSpd+this.wobOff)*this.wobAmp;
+    this.y+=this.vy;
+    // gentle size breathing then shrink
+    let p=this.life/this.maxLife;
+    if(p<0.15) this.size=this.initSize*(p/0.15);
+    else this.size=this.initSize*(1-Math.pow((p-0.15)/0.85,2));
+  }
+  get dead(){return this.life>=this.maxLife||this.size<0.05}
+  get progress(){return this.life/this.maxLife}
+  draw(){
+    // smooth bell-curve opacity: fade in then gently fade out
+    let p=this.progress;
+    let alpha;
+    if(p<0.15) alpha=p/0.15;
+    else alpha=1-Math.pow((p-0.15)/0.85,1.5);
+    alpha*=0.45; // overall softness cap
+    if(alpha<0.005)return;
+
+    ctx.save();
+    ctx.globalAlpha=alpha;
+
+    // Outermost whisper glow
+    let g0=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.size*10);
+    g0.addColorStop(0,`hsla(${this.hue},${this.sat}%,${this.lit}%,.06)`);
+    g0.addColorStop(1,`hsla(${this.hue},${this.sat}%,${this.lit}%,0)`);
+    ctx.beginPath();ctx.arc(this.x,this.y,this.size*10,0,Math.PI*2);
+    ctx.fillStyle=g0;ctx.fill();
+
+    // Soft mid glow
+    let g1=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.size*5);
+    g1.addColorStop(0,`hsla(${this.hue},${this.sat}%,${this.lit}%,.15)`);
+    g1.addColorStop(1,`hsla(${this.hue},${this.sat}%,${this.lit}%,0)`);
+    ctx.beginPath();ctx.arc(this.x,this.y,this.size*5,0,Math.PI*2);
+    ctx.fillStyle=g1;ctx.fill();
+
+    // Warm core
+    let g2=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.size*1.8);
+    g2.addColorStop(0,`hsla(${this.hue},${this.sat-10}%,${Math.min(92,this.lit+10)}%,.4)`);
+    g2.addColorStop(1,`hsla(${this.hue},${this.sat}%,${this.lit}%,0)`);
+    ctx.beginPath();ctx.arc(this.x,this.y,this.size*1.8,0,Math.PI*2);
+    ctx.fillStyle=g2;ctx.fill();
+
+    ctx.restore();
+  }
+}
+
+// Throttled spawn on mouse move
+let lastSpawn=0;
+let moveAccum=0;
+window.addEventListener('mousemove',e=>{
+  mouse.px=mouse.x;
+  mouse.py=mouse.y;
+  mouse.x=e.clientX;
+  mouse.y=e.clientY;
+  mouse.active=true;
+
+  let dx=mouse.x-mouse.px,dy=mouse.y-mouse.py;
+  let dist=Math.sqrt(dx*dx+dy*dy);
+  moveAccum+=dist;
+
+  // spawn one glimmer every ~6px of movement
+  if(moveAccum>6){
+    let count=Math.min(Math.floor(moveAccum/6),3);
+    moveAccum=0;
+    for(let i=0;i<count;i++){
+      if(mouseTrail.length>=TRAIL_MAX){
+        let oldest=0,best=0;
+        for(let j=0;j<mouseTrail.length;j++){if(mouseTrail[j].progress>best){best=mouseTrail[j].progress;oldest=j}}
+        mouseTrail.splice(oldest,1);
+      }
+      mouseTrail.push(new Glimmer(mouse.x,mouse.y));
+    }
+  }
+});
+
+window.addEventListener('mouseleave',()=>{mouse.active=false});
+
+// Gentle cursor ambient glow
+function drawCursorGlow(){
+  if(!mouse.active||mouse.x<0)return;
+  ctx.save();
+  // Very soft wide halo
+  let g=ctx.createRadialGradient(mouse.x,mouse.y,0,mouse.x,mouse.y,80);
+  g.addColorStop(0,'hsla(40,70%,75%,.045)');
+  g.addColorStop(0.4,'hsla(40,65%,70%,.02)');
+  g.addColorStop(1,'hsla(40,60%,65%,0)');
+  ctx.beginPath();ctx.arc(mouse.x,mouse.y,80,0,Math.PI*2);
+  ctx.fillStyle=g;ctx.fill();
+  // Tiny warm center dot
+  let g2=ctx.createRadialGradient(mouse.x,mouse.y,0,mouse.x,mouse.y,5);
+  g2.addColorStop(0,'hsla(42,70%,82%,.1)');
+  g2.addColorStop(1,'hsla(42,70%,80%,0)');
+  ctx.beginPath();ctx.arc(mouse.x,mouse.y,5,0,Math.PI*2);
+  ctx.fillStyle=g2;ctx.fill();
+  ctx.restore();
+}
+
+// ===== MAIN ANIMATION LOOP =====
+function animate(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // Ambient particles
+  particles.forEach(p=>{p.update();p.draw()});
+
+  // Mouse trail meteors
+  for(let i=mouseTrail.length-1;i>=0;i--){
+    mouseTrail[i].update();
+    mouseTrail[i].draw();
+    if(mouseTrail[i].dead)mouseTrail.splice(i,1);
+  }
+
+  // Cursor glow
+  drawCursorGlow();
+
+  requestAnimationFrame(animate);
+}
+animate();
+
+// ===== NAV / REVEAL / SMOOTH SCROLL =====
+const nav=document.getElementById('main-nav');
+window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>50));
+const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+document.querySelectorAll('.nav-links a').forEach(a=>{a.addEventListener('click',e=>{e.preventDefault();document.querySelector(a.getAttribute('href'))?.scrollIntoView({behavior:'smooth'});document.querySelector('.nav-links').classList.remove('show')})});
+</script>
+</body>
+</html>
